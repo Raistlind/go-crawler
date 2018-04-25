@@ -24,6 +24,14 @@ func readMaze(filename string) [][]int {
 	return maze
 }
 
+type point struct{
+	i,j int
+}
+
+func walk(maze [][]int, start, end point){
+
+}
+
 func main(){
 	maze :=	readMaze("maze/maze.in")
 	for i := range maze	{
@@ -32,4 +40,5 @@ func main(){
 		}
 		fmt.Println()
 	}
+	walk(maze, point{0,0}, point{len(maze) - 1, len(maze[0]) - 1})
 }
