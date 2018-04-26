@@ -28,8 +28,29 @@ type point struct{
 	i,j int
 }
 
-func walk(maze [][]int, start, end point){
+var dirs = [4]point {
+	{-1,0}, {0,-1}, {1,0}, {0,1}
+}
 
+func (p point)add(r point) point{
+		return point {p.i+r.i,p.j+r.j}
+}
+func walk(maze [][]int, start, end point){
+	steps := make([][]int ,len(maze))
+	for i := range steps {
+		steps[i] = make ([]int , len(maze[i]))
+	}
+
+	Q := []point{start}
+
+	for len(Q) > 0 {
+		cur := Q[0]
+		Q = Q[1:]
+		for _, dir := range dirs {
+			next := cur.add(dir)
+		}
+
+	}
 }
 
 func main(){
