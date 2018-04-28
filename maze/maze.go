@@ -91,6 +91,46 @@ func walk(maze [][]int, start, end point) [][]int{
 	return steps
 }
 
+func getPath(steps [][]int, start,end point) [][]int {
+	path := make ([][]int , len(steps))
+	for i := range path {
+		path[i] = make([]int, len(steps[i]))
+	}
+
+	Q := []point{end}
+
+	endNum := steps[end.i][end.j]
+	curNum := endNum
+
+	for len(Q) > 0 {
+		cur := Q[0]
+		Q = Q[1:]
+
+		if cur == start {
+			break
+		}
+
+		for _,dir := range dirs{
+			next := cur.add(dir)
+			val,ok := next.at(steps)
+			if !ok || val == endNum {
+				continue
+			}
+
+			if val == curNum -1 {
+				curNum = curNum -1
+
+				path[cur.i][cur.j] = steps[cur.i][cur.j]
+				Q = append(Q, next)
+				break
+			}
+
+		}
+
+	}
+	return path
+}
+
 func main(){
 	maze :=	readMaze("maze/maze.in")
 	for i := range maze	{
@@ -107,6 +147,16 @@ func main(){
 			fmt.Printf("%3d",val)
 		}
 		fmt.Println()
+	}
+
+	fmt.Println()
+	path := getPath(steps, point{0,0}, point {len(steps)-1,len(steps[0])-1})
+	for _, row := range path {
+		for _ , val := range row {
+			fmt.Printf("%3d",val)
+		}
+		fmt.Println()
 
 	}
+
 }
