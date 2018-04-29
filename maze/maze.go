@@ -132,6 +132,7 @@ func getPath(steps [][]int, start,end point) [][]int {
 }
 
 func main(){
+	//读取迷宫定义
 	maze :=	readMaze("maze/maze.in")
 	for i := range maze	{
 		for j := range maze[i]{
@@ -140,6 +141,7 @@ func main(){
 		fmt.Println()
 	}
 
+	//计算迷宫路径
 	fmt.Println()
 	steps := walk(maze, point{0,0}, point{len(maze) - 1, len(maze[0]) - 1})
 	for _, row := range steps {
@@ -149,6 +151,7 @@ func main(){
 		fmt.Println()
 	}
 
+	//去除走不通的路，只显示正确路径
 	fmt.Println()
 	path := getPath(steps, point{0,0}, point {len(steps)-1,len(steps[0])-1})
 	for _, row := range path {
