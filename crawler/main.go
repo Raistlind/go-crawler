@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"golang.org/x/text/transform"
-	"golang.org/x/text/encoding/simplifiedchinese"
+	"io"
+	"golang.org/x/text/encoding"
+	"bufio"
+	"golang.org/x/net/html/charset"
 )
 
 func main(){
@@ -19,10 +22,20 @@ func main(){
 		fmt.Println("Error: status code", resp.StatusCode)
 		return
 	}
-	utf8Reader := transform.NewReader(resp.Body,simplifiedchinese.GBK.NewDecoder())
+	e := determineEncoding(resp.Body)
+	utf8Reader := transform.NewReader(resp.Body,e.NewDecoder())
 	all,err := ioutil.ReadAll(utf8Reader)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("%s\n", all)
+}
+
+func determineEncoding(r io.Reader) encoding.Encoding {
+	bytes, err := bufio.NewReader(r).Peek(1024)
+	if err != nil {
+		panic (err)
+	}
+	e, _, _ := charset.DetermineEncoding(bytes,"")
+	return e
 }
