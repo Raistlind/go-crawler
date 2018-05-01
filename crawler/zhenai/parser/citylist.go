@@ -2,7 +2,6 @@ package parser
 
 import (
 	"regexp"
-	"crawler/engine"
 )
 
 const cityListRe = `<a href="(http://www.zhenai.com/zhenghun/[0-9a-z]+)"[^>]*>([^<]+)</a>`
