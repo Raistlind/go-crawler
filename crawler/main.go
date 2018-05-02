@@ -1,25 +1,13 @@
 package main
 
 import (
-	"net/http"
-	"fmt"
-	"io/ioutil"
-	"golang.org/x/text/transform"
-	"io"
-	"golang.org/x/text/encoding"
-	"bufio"
-	"golang.org/x/net/html/charset"
-	"regexp"
+	"GolandProjects/goexercises/crawler/engine"
+	"GolandProjects/goexercises/crawler/zhenai/parser"
 )
 
 func main() {
-
-
-	printCityList(all)
-}
-
-
-
-func printCityList(contents []byte) {
-
+	engine.Run(engine.Request{
+		Url: "http://www.zhenai.com/zhenghun",
+		ParserFunc: parser.ParseCityList,
+	})
 }
