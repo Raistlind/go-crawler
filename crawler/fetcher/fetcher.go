@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var rateLimiter = time.Tick(100 * time.Millisecond)
+var rateLimiter = time.Tick(10 * time.Millisecond)
 
 func Fetch(url string) ([]byte, error) {
 	<-rateLimiter
@@ -24,7 +24,9 @@ func Fetch(url string) ([]byte, error) {
 	request.Header.Add("http-equiv", "Content-Type")
 	request.Header.Add("Content", "text/html")
 	request.Header.Add("charset", "gbk")
-	request.Header.Add("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36 LBBROWSER")
+	request.Header.Add(
+		"User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) "+
+			"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36 LBBROWSER")
 
 	if err != nil {
 		panic(err)
