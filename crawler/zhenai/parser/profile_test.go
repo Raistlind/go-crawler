@@ -4,6 +4,7 @@ import (
 	"testing"
 	"io/ioutil"
 	"GolandProjects/goexercises/crawler/model"
+	"GolandProjects/goexercises/crawler/engine"
 )
 
 func TestParseProfile(t *testing.T) {
@@ -14,7 +15,7 @@ func TestParseProfile(t *testing.T) {
 	}
 
 	result := ParseProfile(contents,
-		//"http://album.zhenai.com/u/108906739",
+		"http://album.zhenai.com/u/108906739",
 		"安静的雪")
 
 	if len(result.Items) != 1 {
@@ -24,25 +25,25 @@ func TestParseProfile(t *testing.T) {
 
 	actual := result.Items[0]
 
-	expected := model.Profile{
-		//Url:  "http://album.zhenai.com/u/108906739",
-		//Type: "zhenai",
-		//Id:   "108906739",
-		//Payload: model.Profile{
-		Age:        34,
-		Height:     162,
-		Weight:     57,
-		Income:     "3001-5000元",
-		Gender:     "女",
-		Name:       "安静的雪",
-		Xinzuo:     "牡羊座",
-		Occupation: "人事/行政",
-		Marriage:   "离异",
-		House:      "已购房",
-		Hokou:      "山东菏泽",
-		Education:  "大学本科",
-		Car:        "未购车",
-		//},
+	expected := engine.Item{
+		Url:  "http://album.zhenai.com/u/108906739",
+		Type: "zhenai",
+		Id:   "108906739",
+		Payload: model.Profile{
+			Age:        34,
+			Height:     162,
+			Weight:     57,
+			Income:     "3001-5000元",
+			Gender:     "女",
+			Name:       "安静的雪",
+			Xinzuo:     "牡羊座",
+			Occupation: "人事/行政",
+			Marriage:   "离异",
+			House:      "已购房",
+			Hokou:      "山东菏泽",
+			Education:  "大学本科",
+			Car:        "未购车",
+		},
 	}
 
 	if actual != expected {
