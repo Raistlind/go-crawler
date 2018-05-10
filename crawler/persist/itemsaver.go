@@ -8,7 +8,7 @@ import (
 	"gopkg.in/olivere/elastic.v5"
 )
 
-func ItemSaver() (chan engine.Item, error) {
+func ItemSaver(index string) (chan engine.Item, error) {
 
 	client, err := elastic.NewClient(elastic.SetSniff(false))
 
@@ -23,7 +23,7 @@ func ItemSaver() (chan engine.Item, error) {
 			log.Printf("Item Saver: got item #%d: %v", itemCount, item)
 			itemCount++
 
-			err := save(client, item)
+			err := save(client, item, index)
 			if err != nil {
 				log.Printf("Item Saver: error saving item %v: %v", item, err)
 			}
@@ -32,13 +32,13 @@ func ItemSaver() (chan engine.Item, error) {
 	return out, nil
 }
 
-func save(client *elastic.Client, item engine.Item) error {
+func save(client *elastic.Client, item engine.Item, index string) error {
 
 	if item.Type == "" {
 		return errors.New("must supply Type")
 	}
 
-	indexService := client.Index().Index("dating_profile").Type(item.Type).BodyJson(item)
+	indexService := client.Index().Index(index).Type(item.Type).BodyJson(item)
 
 	if item.Id != "" {
 		indexService.Id(item.Id)

@@ -14,7 +14,7 @@ func TestParseCityList(t *testing.T) {
 	}
 
 	//fmt.Printf("%s", contents)
-	result := ParseCityList(contents)
+	result := ParseCityList(contents, "")
 
 
 	//for _, item := range result.Items {

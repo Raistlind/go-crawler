@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"log"
 	"time"
+	"encoding/json"
 )
 
 var rateLimiter = time.Tick(10 * time.Millisecond)
@@ -31,8 +32,12 @@ func Fetch(url string) ([]byte, error) {
 	if err != nil {
 		panic(err)
 	}
-	resp, _ := client.Do(request)
-	defer resp.Body.Close()
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Println("there is a error：clinet.do break:: ",err)
+		log.Println(json.Marshal(resp))
+		return nil, err
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println("Error: status code", resp.StatusCode)
@@ -42,6 +47,8 @@ func Fetch(url string) ([]byte, error) {
 	bodyReader := bufio.NewReader(resp.Body)
 	e := determineEncoding(bodyReader)
 	utf8Reader := transform.NewReader(resp.Body, e.NewDecoder())
+
+	defer resp.Body.Close()
 	return ioutil.ReadAll(utf8Reader)
 }
 
