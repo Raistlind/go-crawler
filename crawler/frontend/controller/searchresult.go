@@ -11,10 +11,11 @@ import (
 	"regexp"
 
 	"gopkg.in/olivere/elastic.v5"
-	"imooc.com/ccmouse/learngo/crawler/config"
-	"imooc.com/ccmouse/learngo/crawler/engine"
-	"imooc.com/ccmouse/learngo/crawler/frontend/model"
-	"imooc.com/ccmouse/learngo/crawler/frontend/view"
+
+	"GolandProjects/goexercises/crawler/frontend/view"
+	"GolandProjects/goexercises/crawler/frontend/model"
+	"GolandProjects/goexercises/crawler/config"
+	"GolandProjects/goexercises/crawler/engine"
 )
 
 type SearchResultHandler struct {
@@ -72,7 +73,7 @@ func (h SearchResultHandler) getSearchResult(
 	resp, err := h.client.
 		Search(config.ElasticIndex).
 		Query(elastic.NewQueryStringQuery(
-			rewriteQueryString(q))).
+		rewriteQueryString(q))).
 		From(from).
 		Do(context.Background())
 
