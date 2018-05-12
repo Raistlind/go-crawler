@@ -26,7 +26,7 @@ func (e SimpleEngine) Run(seeds ...Request) {
 
 		parseResult := r.ParserFunc(body)
 		*/
-		parseResult, err := worker(r)
+		parseResult, err := Worker(r)
 		if err != nil {
 			continue
 		}

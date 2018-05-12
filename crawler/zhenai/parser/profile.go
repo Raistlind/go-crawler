@@ -5,6 +5,7 @@ import (
 	"GolandProjects/goexercises/crawler/engine"
 	"GolandProjects/goexercises/crawler/model"
 	"strconv"
+	"GolandProjects/goexercises/crawler_distributed/config"
 )
 
 var ageRe = regexp.MustCompile(
@@ -106,7 +107,7 @@ func (p *ProfileParser) Parse(contents []byte, url string) engine.ParseResult {
 }
 
 func (p *ProfileParser) Serialize() (name string, args interface{}) {
-	return "ProfileParser", p.userName
+	return config.ParseProfile, p.userName
 }
 
 func NewProfileParser(name string) *ProfileParser {

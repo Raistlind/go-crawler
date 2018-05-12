@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	log.Fatal("", serveRpc(fmt.Sprintf(":d", config.ItemSaverPort), config.ElasticIndex))
+	log.Fatal("", serveRpc(fmt.Sprintf(":%d", config.ItemSaverPort), config.ElasticIndex))
 }
 
 func serveRpc(host, index string) error {
