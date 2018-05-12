@@ -1,29 +1,23 @@
-package parser
+package main
 
 import (
 	"testing"
-	"io/ioutil"
-	"GolandProjects/goexercises/crawler/model"
+	"GolandProjects/goexercises/crawler_distributed/rpcsupport"
 	"GolandProjects/goexercises/crawler/engine"
+	"GolandProjects/goexercises/crawler/model"
+	"time"
+	"GolandProjects/goexercises/crawler_distributed/config"
 )
 
-func TestParseProfile(t *testing.T) {
-	contents, err := ioutil.ReadFile("profile_test_data.html")
+func TestItemSaver (t *testing.T) {
+	const host= ":1234"
+	go serveRpc(host, "test1")
+	time.Sleep(time.Second)
 
+	client, err := rpcsupport.NewClient(host)
 	if err != nil {
 		panic(err)
 	}
-
-	result := parseProfile(contents,
-		"http://album.zhenai.com/u/108906739",
-		"安静的雪")
-
-	if len(result.Items) != 1 {
-		t.Errorf("Items should contain 1 "+
-			"element; but was %v", result.Items)
-	}
-
-	actual := result.Items[0]
 
 	expected := engine.Item{
 		Url:  "http://album.zhenai.com/u/108906739",
@@ -46,8 +40,10 @@ func TestParseProfile(t *testing.T) {
 		},
 	}
 
-	if actual != expected {
-		t.Errorf("expected %v; but was %v",
-			expected, actual)
+	result := ""
+	err = client.Call(config.ItemSaverRpc, expected, &result)
+
+	if err != nil || result != "ok" {
+		t.Errorf("result: %s; err: %s", result, err)
 	}
 }

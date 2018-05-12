@@ -3,12 +3,14 @@ package main
 import (
 	"GolandProjects/goexercises/crawler/engine"
 	"GolandProjects/goexercises/crawler/scheduler"
-	"GolandProjects/goexercises/crawler/persist"
 	"GolandProjects/goexercises/crawler/zhenai/parser"
+	"GolandProjects/goexercises/crawler_distributed/persist/client"
+	"fmt"
+	"GolandProjects/goexercises/crawler_distributed/config"
 )
 
 func main() {
-	itemChan, err := persist.ItemSaver("dating_profile")
+	itemChan, err := client.ItemSaver(fmt.Sprintf(":d", config.ItemSaverPort))
 	if err != nil {
 		panic(err)
 	}
@@ -19,12 +21,7 @@ func main() {
 	}
 
 	e.Run(engine.Request{
-		Url:    "http://www.zhenai.com/zhenghun",
-		Parser: engine.NewFuncParser(parser.ParseCityList, "ParseCityList"),
+		Url:        "http://www.zhenai.com/zhenghun",
+		ParserFunc: parser.ParseCityList,
 	})
-
-	//e.Run(engine.Request{
-	//	Url:        "http://www.zhenai.com/zhenghun/shanghai",
-	//	ParserFunc: parser.ParseCity,
-	//})
 }
