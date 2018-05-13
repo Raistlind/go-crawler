@@ -12,13 +12,14 @@ import (
 	"log"
 	"time"
 	"encoding/json"
+	"GolandProjects/goexercises/crawler/config"
 )
 
-var rateLimiter = time.Tick(10 * time.Millisecond)
+var rateLimiter = time.Tick(time.Second / config.Qps)
 
 func Fetch(url string) ([]byte, error) {
 	<-rateLimiter
-	//resp, err := http.Get(url)
+	log.Printf("Fetching url %s", url)
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", url, nil)
 
