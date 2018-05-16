@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $.get("httP://localhost:7888",
+    $.get("httP://localhost:8000/dig",
         {
             "time":gettime(),
             "url":geturl(),
