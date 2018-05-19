@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"strings"
 	"strconv"
 	"net/url"
 	"math/rand"
 	"time"
 	"os"
+	"log"
 )
 
 var uaList = []string{
@@ -76,7 +76,7 @@ func buildUrl(res []resource) []string {
 
 func makeLog(current, refer, ua string) string {
 	u := url.Values{}
-	u.Set("time", 1)
+	u.Set("time", "1")
 	u.Set("url", current)
 	u.Set("refer", refer)
 	u.Set("ua", ua)
@@ -96,28 +96,77 @@ func randInt(min, max int) int {
 	return r.Intn(max-min) + min
 }
 
-func main() {
-	total := flag.Int("total", 100, "how many")
-	filePath := flag.String("filePath", "/usr/local/nginx/logs/dig.log", "file path")
-	flag.Parse()
-
+func maker(quantity int, logChan chan string, finishChan chan bool, name string) {
 	res := ruleResource()
 	list := buildUrl(res)
 
 	logStr := ""
-	for i := 0; i <= *total; i ++ {
+	for i := 0; i < quantity; i ++ {
 		currentUrl := list[randInt(0, len(list)-1)]
 		referUrl := list[randInt(0, len(list)-1)]
 		ua := uaList[randInt(0, len(uaList)-1)]
 
 		logStr = logStr + makeLog(currentUrl, referUrl, ua) + "\n"
-		//ioutil.WriteFile(*filePath, []byte(logStr), 0644)
+	}
+	logChan <- logStr
+	time.Sleep(time.Second)
+	finishChan <- true
+	log.Printf("%s is finished.", name)
+}
+
+func assignTask(total, coroutineNum *int) []int {
+	if *coroutineNum <= 0 {
+		return nil
+	}
+	logNumPerGo := *total / *coroutineNum
+	mod := *total % *coroutineNum
+	var tasks []int
+
+	for i := 0; i < *coroutineNum; i++ {
+		if i == *coroutineNum-1 && mod > 0 {
+			tasks = append(tasks, logNumPerGo+mod)
+		} else {
+			tasks = append(tasks, logNumPerGo)
+		}
+	}
+	log.Printf("there are %d tasks need to process: %v", len(tasks), tasks)
+
+	return tasks
+}
+
+func main() {
+	total := flag.Int("total", 100, "how many")
+	filePath := flag.String("filePath", "/usr/local/nginx/logs/dig.log", "file path")
+	coroutineNum := flag.Int("coroutineNum", 2, "how many coroutine for process")
+	flag.Parse()
+
+	logChan := make(chan string)
+	finishChan := make(chan bool)
+	tasks := assignTask(total, coroutineNum)
+
+	for i, n := range tasks {
+		go maker(n, logChan, finishChan, "Coroutine-"+strconv.Itoa(i))
 	}
 
-	fd, _ := os.OpenFile(*filePath, os.O_RDWR|os.O_APPEND, 0644)
-	fd.Write([]byte(logStr))
+	var fd os.File
+	var finishedCount = 0
+	for {
+		select {
+		case logStr := <-logChan:
+			fd, _ := os.OpenFile(*filePath, os.O_RDWR|os.O_APPEND, 0644)
+			fd.Write([]byte(logStr))
+		case finished := <-finishChan:
+			if finished {
+				finishedCount ++
+			}
+			if finishedCount == *coroutineNum {
+				fd.Close()
+				return
+			}
+		}
+	}
 
 	defer fd.Close()
-	fmt.Println(total, filePath, list)
-	fmt.Println("done. ")
+	//fmt.Println(total, filePath, list)
+	//fmt.Println("done. ")
 }
