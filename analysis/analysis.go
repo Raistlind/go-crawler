@@ -61,7 +61,7 @@ func init() {
 
 func main() {
 	logFilePath := flag.String("logFilePath", "/usr/local/nginx/logs/dig.log", "log file path")
-	routineNum := flag.Int("routineNum", 5, "consumer number by goroutine")
+	routineNum := flag.Int("routineNum", 10, "consumer number by goroutine")
 	l := flag.String("l", "/tmp/log", "this programe runtime log target file path")
 	flag.Parse()
 
@@ -112,12 +112,31 @@ func main() {
 }
 
 func dataStorage(storageChannel chan storageBlock, redisPool *pool.Pool) {
+	for block := range storageChannel {
+		prefix := block.counterType + "_"
+		setKeys := []string{
+			prefix + "day_" + getTime(block.unode.unTime, "day"),
+			prefix + "hour_" + getTime(block.unode.unTime, "hour"),
+			prefix + "min_" + getTime(block.unode.unTime, "min"),
+			prefix + block.unode.unType + "_day_" + getTime(block.unode.unTime, "day"),
+			prefix + block.unode.unType + "_hour_" + getTime(block.unode.unTime, "hour"),
+			prefix + block.unode.unType + "_min_" + getTime(block.unode.unTime, "min"),
+		}
 
+		rowId := block.unode.unRid
+
+		for _, key := range setKeys {
+			ret, err := redisPool.Cmd(block.storageModel, key, 1, rowId).Int()
+			if ret <= 0 || err != nil {
+				log.Errorln("DataStorage redis storage error.", block.storageModel, key, rowId)
+			}
+		}
+	}
 }
 
 func pvCounter(pvChannel chan urlData, storageChannel chan storageBlock) {
 	for data := range pvChannel {
-		sItem := storageBlock{"pv", "ZINCREBY", data.unode,}
+		sItem := storageBlock{"pv", "ZINCRBY", data.unode,}
 		storageChannel <- sItem
 	}
 }
@@ -134,7 +153,7 @@ func uvCounter(uvChannel chan urlData, storageChannel chan storageBlock, redisPo
 			continue
 		}
 
-		sItem := storageBlock{"uv", "ZINCREBY", data.unode,}
+		sItem := storageBlock{"uv", "ZINCRBY", data.unode,}
 		storageChannel <- sItem
 	}
 }
@@ -229,7 +248,7 @@ func formatUrl(url, t string) urlNode {
 			id, _ := strconv.Atoi(idStr)
 			return urlNode{"list", id, url, t}
 		} else {
-			return urlNode{"home", 0, url, t}
+			return urlNode{"home", 1, url, t}
 		}
 	}
 }
